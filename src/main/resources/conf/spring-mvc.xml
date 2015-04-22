@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">
+	
+	<!-- 扫描controller -->
+	<context:component-scan base-package="cn.springmvc.controller"/>
+		
+	<!-- 避免IE在ajax请求时, 返回json出现下载 -->
+	<bean id="jacksonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="supportedMediaTypes">
+            <list>
+                <value>text/html;charset=UTF-8</value>
+            </list>
+        </property>
+	</bean>
+	
+	<!-- 对模型视图添加前后缀 -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:order="10"
+		p:prefix="/WEB-INF/views/" p:suffix=".jsp"/>
+	
+	<!-- REST风格的URL视图解析器配置.该视图解析器的优先级最高 -->	
+	<!-- 配置contentNegotiationManager,使视图解析器不支持扩展文件名,不支持Accept报文头指定的MIME类型,通过请求参数指定MIME类型,参数名为content.例如
+		/sysUser/userList.html :返回一个HTML页面显示的用户列表
+		/sysUser/userList.html?content=xml :返回XML格式的用户列表
+		/sysUser/userList.html?content=json :返回json格式的用户列表  -->
+	<bean id="cnManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean"
+		p:ignoreAcceptHeader="true"
+		p:defaultContentType="text/html"
+		p:favorPathExtension="false" 
+		p:parameterName="content">
+		<property name="mediaTypes">
+			<map>
+				<entry key="html" value="text/html"/>
+				<entry key="xml" value="application/xml"/>
+				<entry key="json" value="application/json"/>
+			</map>
+		</property>	
+	</bean>
+	
+	<bean id="xmlMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
+		<property name="streamDriver">
+			<bean class="com.thoughtworks.xstream.io.xml.StaxDriver"/>
+		</property>
+		<property name="annotatedClasses">
+			<list>
+				<value>cn.springmvc.model.SysUser</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver"
+		p:order="0" 
+		p:contentNegotiationManager-ref="cnManager">	
+		<property name="defaultViews">
+			<list>
+				<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"
+					p:modelKey="sysUserList"/>
+				<bean class="org.springframework.web.servlet.view.xml.MarshallingView"
+					p:modelKey="sysUserList" p:marshaller-ref="xmlMarshaller"/>
+			</list>
+		</property>
+	</bean>
+	<!-- REST风格URL解析器配置结束 -->
+
+</beans>

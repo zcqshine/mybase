@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+<!--  targetRuntime="MyBatis3Simple" -->
+	<classPathEntry location="/Users/zcqshine/Documents/workspace/tomcat-deploy/mybase/WEB-INF/lib/mysql-connector-java-5.1.29.jar" />
+	<context id="MBG" defaultModelType="flat">
+		<property name="beginningDelimiter" value="`"/>
+		<property name="endingDelimiter" value="`"/>
+		
+		<plugin type="cn.chowx.common.MySQLPaginationPlugin"></plugin>
+		
+		<commentGenerator>
+			<property name="suppressDate" value="true"/>
+		</commentGenerator>
+		
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
+			connectionURL="jdbc:mysql://localhost:3306/springmvc?useUnicode=true&amp;characterEncoding=utf-8"
+			userId="root" password="171057937" />
+		<javaModelGenerator targetPackage="cn.springmvc.model"
+			targetProject="mybase" />
+		<sqlMapGenerator targetPackage="mapper" targetProject="mybase" />
+		<javaClientGenerator targetPackage="cn.springmvc.dao"
+			targetProject="mybase" type="XMLMAPPER" />
+		
+		<table tableName="%" enableSelectByExample="true" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" selectByExampleQueryId="false">
+			<generatedKey column="id" sqlStatement="Mysql"/>
+		</table>
+		
+	</context>
+</generatorConfiguration>
